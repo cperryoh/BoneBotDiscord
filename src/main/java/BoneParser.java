@@ -159,15 +159,15 @@ public class BoneParser {
 
         //Same thing as all meals, but it filters which to print via the meal variable
         String out = "";
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < Meal.values().length; i++) {
             Meal value = Meal.values()[i];
             if (meal == value) {
-                List<String> breakfast = getMealList(value, tomorrow);
+                List<String> mealList = getMealList(value, tomorrow);
                 if (value != Meal.DINNER)
                     out += "**" + superCase(value.toString()) + "**\n";
                 else
                     out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
-                for (String s : breakfast) {
+                for (String s : mealList) {
                     out += " -" + s + "\n";
                 }
                 out += "\n";
