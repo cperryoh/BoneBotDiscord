@@ -134,9 +134,9 @@ public class BoneParser {
         }
 
         //print meals based on decision above
-        for (int i = 0; i < 3; i++) {
-            Meal value = Meal.values()[i];
-            List<String> breakfast = getMealList(value, tomorrow);
+        for (int i = 0; i < mealsToPrint.length; i++) {
+            Meal value = mealsToPrint[i];
+            List<String> mealList = getMealList(value, tomorrow);
 
             //if not dinner just make bold name of meal
             if (value != Meal.DINNER)
@@ -147,7 +147,7 @@ public class BoneParser {
                 out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
 
             //loop through value fetched from parsed and add them to the string
-            for (String s : breakfast) {
+            for (String s : mealList) {
                 out += " -" + s + "\n";
             }
             out += "\n";
