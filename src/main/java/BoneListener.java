@@ -1,54 +1,159 @@
-import net.dv8tion.jda.api.entities.Channel;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
+import java.util.Date;
 import java.util.List;
 
 public class BoneListener extends ListenerAdapter {
     List<Thread> threads;
+
+    enum Day {today, tomorrow}
+
     public BoneListener(List<Thread> threads) {
-        this.threads=threads;
+        this.threads = threads;
     }
 
-    public void printCommands(TextChannel c) {
-        String out ="Hello, I am steve.\n!steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
-        postPostToChannel(c, out);
+    public void printCommands(SlashCommandInteractionEvent c) {
+        String out = "Hello, I am steve.\n!steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
+        c.getChannel().sendMessage(out).complete();
     }
-    public void postPostToChannel(TextChannel c,String content){
-        c.sendMessage(content).complete();
+
+    @Override
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        try {
+
+
+            switch (event.getName()) {
+
+                //receive steve command
+                case "steve": {
+                    //reply so message does not error out
+                    event.reply("Hold on let me go look").complete();
+
+                    //check that the user gave options for both meals
+                    if (!(event.getOption("day") != null && event.getOption("meal") != null)) {
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /steve command");
+                        printCommands(event);
+                        System.out.println("Not valid command, printing intro");
+                        return;
+                    }
+
+                    //pull user arguments
+                    Day day = Day.values()[event.getOption("day").getAsInt()];
+                    BoneParser.Meal meal = BoneParser.Meal.values()[event.getOption("meal").getAsInt()];
+
+
+                    //determine if user is asking for tomorrow's meals
+                    boolean tomorrow = day.toString().equals("tomorrow");
+
+
+
+                    //if user asks for all meals, send them and return
+                    if (meal.toString().equals("ALL")) {
+                        System.out.println("Printing all");
+                        event.getChannel().sendMessage(BoneParser.getAllMeals(tomorrow,false)).complete();
+                        return;
+                    }
+
+                    Date dt = new Date();
+                    DateTime dtOrg = new DateTime(dt);
+                    int daysToAdd= (tomorrow)?1:0;
+                    dt = dtOrg.plusDays(daysToAdd).toDate();
+                    BoneParser.DayOfWeek dayOfWeek= BoneParser.getDayOfWeek(dt);
+                    String dayRef= (tomorrow)?"tomorrow":"today";
+                    if (dayOfWeek == BoneParser.DayOfWeek.SUNDAY||dayOfWeek == BoneParser.DayOfWeek.SATURDAY) {
+                        if (dayOfWeek == BoneParser.DayOfWeek.SATURDAY) {
+                            if (meal != BoneParser.Meal.BRUNCH) {
+                                event.getChannel().sendMessage("Sorry, there is only brunch "+dayRef+".").complete();
+                            } else {
+                                String mealsOut = BoneParser.printSingleMeal(meal, true);
+                                event.getChannel().sendMessage(mealsOut).complete();
+                            }
+                        } else if (dayOfWeek == BoneParser.DayOfWeek.SUNDAY) {
+                            if (meal != BoneParser.Meal.BRUNCH && meal != BoneParser.Meal.DINNER) {
+                                event.getChannel().sendMessage("Sorry, there is only brunch and dinner "+dayRef+".").complete();
+                            } else {
+                                String mealsOut = BoneParser.printSingleMeal(meal, false);
+                                event.getChannel().sendMessage(mealsOut).complete();
+                            }
+                        }
+                        return;
+                    }else{
+                        if(meal==BoneParser.Meal.BRUNCH){
+                            event.getChannel().sendMessage("Sorry, there is no brunch "+dayRef+".").complete();
+                            return;
+                        }
+                    }
+
+                    //print that message was received
+                    System.out.println("Got message: " + event.getCommandString());
+                    try {
+
+                        //print that we are sending a meal out
+                        System.out.println("Printing single meal");
+
+                        //get meal output
+                        String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
+
+                        //send message
+                        event.getChannel().sendMessage(mealsOut).complete();
+
+                    } catch (Exception e) {
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a !steve command").complete();
+                        System.out.println("Not valid command, printing intro");
+                        printCommands(event);
+                    }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
-        TextChannel c;
-        if(!BoneBot.hasBotChannel(event.getGuild(),"steve-menu-feed")){
-            c=event.getGuild().createTextChannel("steve-menu-feed").complete();
-        }else{
-            c= event.getGuild().getTextChannelsByName("steve-menu-feed",false).get(0);
-        }
-        Thread postMeals=new Thread(() -> {
 
-            int oneDay=1000*60*60*24;
-            while(true){
+        //check that guild has a steve message channel, if not make one
+        TextChannel c;
+        if (!BoneBot.hasBotChannel(event.getGuild(), "steve-menu-feed")) {
+            c = event.getGuild().createTextChannel("steve-menu-feed").complete();
+        } else {
+            c = event.getGuild().getTextChannelsByName("steve-menu-feed", false).get(0);
+        }
+
+        //thread to post meals every day at 10am
+        Thread postMeals = new Thread(() -> {
+
+            int oneDay = 1000 * 60 * 60 * 24;
+            while (true) {
+
+                //sync thread to 10am
                 try {
 
                     DateTime date = new DateTime();
                     int hour = date.getHourOfDay();
-                    if(hour==8){
+                    if (hour == 8) {
                         break;
                     }
-                    Thread.sleep(1000*60);
+                    Thread.sleep(1000 * 60);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            while (true){
-                c.sendMessage(BoneParser.printAllMeals(false)).complete();
+            //every 24hrs post message
+            while (true) {
+                c.sendMessage(BoneParser.getAllMeals(false,false)).complete();
                 try {
                     Thread.sleep(oneDay);
                 } catch (InterruptedException e) {
@@ -56,75 +161,10 @@ public class BoneListener extends ListenerAdapter {
                 }
             }
         });
+
+        //run thread
         postMeals.run();
     }
 
-    public void sendMessage(User user, String content) {
-        user.openPrivateChannel()
-                .flatMap(channel -> channel.sendMessage(content))
-                .queue();
-    }
-    public boolean isValidCommand(String day, String meal){
-        boolean dayValid=day.equals("today")||day.equals("tomorrow");
-        boolean mealValid=meal.equals("breakfast")||meal.equals("lunch")||meal.equals("dinner")||meal.equals("all");
-        return dayValid && mealValid;
-    }
 
-
-    @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
-        if (content.contains("!steve")&&content.indexOf("!steve")==0) {
-
-            System.out.println("Got message: "+content);
-            if(content.equals("!steve")){
-                User user = event.getAuthor();
-                printCommands((TextChannel) event.getChannel());
-                System.out.println("Printing intro");
-                return;
-            }
-            try {
-
-                String input = content.substring(7);
-                String[] args = input.split(" ");
-                String day = args[0].toLowerCase().replaceAll("tm", "tomorrow");
-                if (args.length ==2) {
-                    String mealStr = args[1].toLowerCase();
-
-                    if(!isValidCommand(day,mealStr)){
-                        sendMessage(event.getAuthor(),"That is not a valid command, here is the format of a !steve command");
-                        printCommands((TextChannel) event.getChannel());
-                        System.out.println("Not valid command, printing intro");
-                        return;
-                    }
-                    boolean tomorrow = day.equals("tomorrow");
-                    if(mealStr.toLowerCase().equals("all")){
-                        System.out.println("Printing all");
-                        sendMessage(event.getAuthor(),BoneParser.printAllMeals(tomorrow));
-                        return;
-                    }
-                    BoneParser.Meal meal = BoneParser.Meal.valueOf(mealStr.toUpperCase());
-                    System.out.println("Printing single meal");
-                    String mealsOut = BoneParser.printSingleMeal(meal,tomorrow);
-                    sendMessage(event.getAuthor(),mealsOut);
-                }
-                else{
-                    printCommands((TextChannel) event.getChannel());
-                    System.out.println("Not valid command, printing intro");
-                }
-
-            } catch (Exception e) {
-                sendMessage(event.getAuthor(),"That is not a valid command, here is the format of a !steve command");
-                System.out.println("Not valid command, printing intro");
-                printCommands((TextChannel) event.getChannel());
-            }
-        }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
