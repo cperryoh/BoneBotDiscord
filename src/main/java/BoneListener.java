@@ -36,7 +36,7 @@ public class BoneListener extends ListenerAdapter {
 
                     //check that the user gave options for both meals
                     if (!(event.getOption("day") != null && event.getOption("meal") != null)) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /steve command");
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /cafe command");
                         printCommands(event);
                         System.out.println("Not valid command, printing intro");
                         return;
@@ -103,7 +103,7 @@ public class BoneListener extends ListenerAdapter {
                         event.getChannel().sendMessage(mealsOut).complete();
 
                     } catch (Exception e) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a !steve command").complete();
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /cafe command").complete();
                         System.out.println("Not valid command, printing intro");
                         printCommands(event);
                     }
@@ -126,10 +126,10 @@ public class BoneListener extends ListenerAdapter {
 
         //check that guild has a steve message channel, if not make one
         TextChannel c;
-        if (!BoneBot.hasBotChannel(event.getGuild(), "steve-menu-feed")) {
-            c = event.getGuild().createTextChannel("steve-menu-feed").complete();
+        if (!BoneBot.hasBotChannel(event.getGuild(), "menu-feed")) {
+            c = event.getGuild().createTextChannel("menu-feed").complete();
         } else {
-            c = event.getGuild().getTextChannelsByName("steve-menu-feed", false).get(0);
+            c = event.getGuild().getTextChannelsByName("menu-feed", false).get(0);
         }
 
         //thread to post meals every day at 10am
