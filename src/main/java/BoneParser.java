@@ -166,7 +166,7 @@ public class BoneParser {
 
         //Same thing as all meals, but it filters which to print via the meal variable
         String out = "";
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < Meal.values().length; i++) {
             Meal value = Meal.values()[i];
             if (meal == value) {
                 List<String> breakfast = getMealList(value, tomorrow);

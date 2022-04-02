@@ -70,14 +70,14 @@ public class BoneListener extends ListenerAdapter {
                             if (meal != BoneParser.Meal.BRUNCH) {
                                 event.getChannel().sendMessage("Sorry, there is only brunch "+dayRef+".").complete();
                             } else {
-                                String mealsOut = BoneParser.printSingleMeal(meal, true);
+                                String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
                                 event.getChannel().sendMessage(mealsOut).complete();
                             }
                         } else if (dayOfWeek == BoneParser.DayOfWeek.SUNDAY) {
                             if (meal != BoneParser.Meal.BRUNCH && meal != BoneParser.Meal.DINNER) {
                                 event.getChannel().sendMessage("Sorry, there is only brunch and dinner "+dayRef+".").complete();
                             } else {
-                                String mealsOut = BoneParser.printSingleMeal(meal, false);
+                                String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
                                 event.getChannel().sendMessage(mealsOut).complete();
                             }
                         }
