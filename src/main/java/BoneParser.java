@@ -110,10 +110,10 @@ public class BoneParser {
 
         //build out str
         String out = "";
-        if(intro)
-            out+="__**Hello gamers here are the**__ " + ((tomorrow) ? "__**meals for tomorrow**__" : "__**meals for today**__") + "\n\n";
-        else
-            out+="\n\n";
+        /*if(intro)
+            //out+="__**Hello gamers here are the**__ " + ((tomorrow) ? "__**meals for tomorrow**__" : "__**meals for today**__") + "\n\n";
+        else*/
+        out+="\n\n";
 
         //Get day as an DayOfWeek variable
         Date dt = new Date();
@@ -134,23 +134,30 @@ public class BoneParser {
         }
 
         //print meals based on decision above
-        for (int i = 0; i < 3; i++) {
-            Meal value = Meal.values()[i];
-            List<String> breakfast = getMealList(value, tomorrow);
-
+        List<Parser> parsers = new ArrayList<>();
+        for (Meal m:mealsToPrint) {
+            parsers.add(new Parser(m,tomorrow));
             //if not dinner just make bold name of meal
-            if (value != Meal.DINNER)
-                out += "**" + superCase(value.toString()) + "**\n";
 
-            //if dinner add floor dinner in bold
-            else
-                out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
+        }
+        for(Parser t:parsers){
+            try {
+                List<String> mealList=t.join();
+                if (t.meal != Meal.DINNER)
+                    out += "**" + superCase(t.meal.toString()) + "**\n";
 
-            //loop through value fetched from parsed and add them to the string
-            for (String s : breakfast) {
-                out += " -" + s + "\n";
+                    //if dinner add floor dinner in bold
+                else
+                    out += "**Dinner**\n";
+
+                //loop through value fetched from parsed and add them to the string
+                for (String s : mealList) {
+                    out += " -" + s + "\n";
+                }
+                out += "\n";
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            out += "\n";
         }
         return out;
     }
@@ -166,7 +173,7 @@ public class BoneParser {
                 if (value != Meal.DINNER)
                     out += "**" + superCase(value.toString()) + "**\n";
                 else
-                    out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
+                    out += "**Dinner**\n";
                 for (String s : breakfast) {
                     out += " -" + s + "\n";
                 }

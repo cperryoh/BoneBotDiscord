@@ -18,7 +18,7 @@ public class BoneListener extends ListenerAdapter {
     }
 
     public void printCommands(SlashCommandInteractionEvent c) {
-        String out = "Hello, I am steve.\n!steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
+        String out = "Hello, I am cafe.\n/cafe [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
         c.getChannel().sendMessage(out).complete();
     }
 
@@ -30,7 +30,7 @@ public class BoneListener extends ListenerAdapter {
             switch (event.getName()) {
 
                 //receive steve command
-                case "steve": {
+                case "cafe": {
                     //reply so message does not error out
                     event.reply("Hold on let me go look").complete();
 
