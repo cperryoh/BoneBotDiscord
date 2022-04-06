@@ -60,7 +60,7 @@ public class BoneBot {
             //add commands to bot
             CommandListUpdateAction commands = builder.updateCommands();
             commands.addCommands(
-                    Commands.slash("howard", "Ask steve to fetch the bone meals for today")
+                    Commands.slash("howard", "Ask howard to fetch the bone meals for today")
                             .addOptions(new OptionData(INTEGER, "day", "the day to get the meals for") // USER type allows to include members of the server or other users by id
                                     .setRequired(true).addChoice("today",0).addChoice("tomorrow",1)) // This command requires a parameter
                             .addOptions(new OptionData(INTEGER, "meal", "the meal(s) to fetch").addChoice("breakfast",0).addChoice("brunch",1).addChoice("lunch",2).addChoice("dinner",3).addChoice("all",4)) // optional reason
@@ -76,10 +76,10 @@ public class BoneBot {
             //also create a thread for each guild to periodically post meal updates
             for(Guild g:guilds){
                 TextChannel c;
-                if(!hasBotChannel(g,"steve-menu-feed")){
-                    c=g.createTextChannel("steve-menu-feed").complete();
+                if(!hasBotChannel(g,"bone-menu")){
+                    c=g.createTextChannel("bone-menu").complete();
                 }else{
-                    c= g.getTextChannelsByName("steve-menu-feed",false).get(0);
+                    c= g.getTextChannelsByName("bone-menu",false).get(0);
                 }
 
                 //add thread

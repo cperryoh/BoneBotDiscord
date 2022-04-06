@@ -18,7 +18,7 @@ public class BoneListener extends ListenerAdapter {
     }
 
     public void printCommands(SlashCommandInteractionEvent c) {
-        String out = "Hello, I am steve.\n!steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
+        String out = "Hello, I am howard.\n/steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
         c.getChannel().sendMessage(out).complete();
     }
 
@@ -30,13 +30,13 @@ public class BoneListener extends ListenerAdapter {
             switch (event.getName()) {
 
                 //receive steve command
-                case "steve": {
+                case "howard": {
                     //reply so message does not error out
                     event.reply("Hold on let me go look").complete();
 
                     //check that the user gave options for both meals
                     if (!(event.getOption("day") != null && event.getOption("meal") != null)) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /steve command");
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /howard command");
                         printCommands(event);
                         System.out.println("Not valid command, printing intro");
                         return;
@@ -103,7 +103,7 @@ public class BoneListener extends ListenerAdapter {
                         event.getChannel().sendMessage(mealsOut).complete();
 
                     } catch (Exception e) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a !steve command").complete();
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /howard command").complete();
                         System.out.println("Not valid command, printing intro");
                         printCommands(event);
                     }
@@ -126,10 +126,10 @@ public class BoneListener extends ListenerAdapter {
 
         //check that guild has a steve message channel, if not make one
         TextChannel c;
-        if (!BoneBot.hasBotChannel(event.getGuild(), "steve-menu-feed")) {
-            c = event.getGuild().createTextChannel("steve-menu-feed").complete();
+        if (!BoneBot.hasBotChannel(event.getGuild(), "bone-menu")) {
+            c = event.getGuild().createTextChannel("bone-menu").complete();
         } else {
-            c = event.getGuild().getTextChannelsByName("steve-menu-feed", false).get(0);
+            c = event.getGuild().getTextChannelsByName("bone-menu", false).get(0);
         }
 
         //thread to post meals every day at 10am
