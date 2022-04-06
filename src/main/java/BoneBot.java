@@ -60,7 +60,7 @@ public class BoneBot {
             //add commands to bot
             CommandListUpdateAction commands = builder.updateCommands();
             commands.addCommands(
-                    Commands.slash("steve", "Ask steve to fetch the bone meals for today")
+                    Commands.slash("howard", "Ask steve to fetch the bone meals for today")
                             .addOptions(new OptionData(INTEGER, "day", "the day to get the meals for") // USER type allows to include members of the server or other users by id
                                     .setRequired(true).addChoice("today",0).addChoice("tomorrow",1)) // This command requires a parameter
                             .addOptions(new OptionData(INTEGER, "meal", "the meal(s) to fetch").addChoice("breakfast",0).addChoice("brunch",1).addChoice("lunch",2).addChoice("dinner",3).addChoice("all",4)) // optional reason
