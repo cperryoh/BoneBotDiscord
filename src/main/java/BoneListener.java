@@ -1,3 +1,5 @@
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -5,7 +7,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class BoneListener extends ListenerAdapter {
@@ -18,7 +23,7 @@ public class BoneListener extends ListenerAdapter {
     }
 
     public void printCommands(SlashCommandInteractionEvent c) {
-        String out = "Hello, I am howard.\n/steve [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
+        String out = "Hello, I am steve.\n/howard [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
         c.getChannel().sendMessage(out).complete();
     }
 
@@ -30,7 +35,7 @@ public class BoneListener extends ListenerAdapter {
             switch (event.getName()) {
 
                 //receive steve command
-                case "howard": {
+                case "steve": {
                     //reply so message does not error out
                     event.reply("Hold on let me go look").complete();
 
@@ -55,7 +60,9 @@ public class BoneListener extends ListenerAdapter {
                     //if user asks for all meals, send them and return
                     if (meal.toString().equals("ALL")) {
                         System.out.println("Printing all");
-                        event.getChannel().sendMessage(BoneParser.getAllMeals(tomorrow,false)).complete();
+                        HashMap<String,String> mealsOut = BoneParser.getAllMeals(tomorrow,true);
+                        event.getChannel().sendMessageEmbeds(buildEmbed("Meals for "+((tomorrow)?"tomorrow":"today")+".",Color.red,mealsOut)).complete();
+
                         return;
                     }
 
@@ -70,15 +77,17 @@ public class BoneListener extends ListenerAdapter {
                             if (meal != BoneParser.Meal.BRUNCH) {
                                 event.getChannel().sendMessage("Sorry, there is only brunch "+dayRef+".").complete();
                             } else {
-                                String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
-                                event.getChannel().sendMessage(mealsOut).complete();
+                                ArrayList<String> mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
+                                event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
+
                             }
                         } else if (dayOfWeek == BoneParser.DayOfWeek.SUNDAY) {
                             if (meal != BoneParser.Meal.BRUNCH && meal != BoneParser.Meal.DINNER) {
                                 event.getChannel().sendMessage("Sorry, there is only brunch and dinner "+dayRef+".").complete();
                             } else {
-                                String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
-                                event.getChannel().sendMessage(mealsOut).complete();
+                                ArrayList<String> mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
+                                event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
+
                             }
                         }
                         return;
@@ -97,13 +106,14 @@ public class BoneListener extends ListenerAdapter {
                         System.out.println("Printing single meal");
 
                         //get meal output
-                        String mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
+                        ArrayList<String> mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
 
                         //send message
-                        event.getChannel().sendMessage(mealsOut).complete();
+
+                        event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
 
                     } catch (Exception e) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /howard command").complete();
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /steve command").complete();
                         System.out.println("Not valid command, printing intro");
                         printCommands(event);
                     }
@@ -120,7 +130,37 @@ public class BoneListener extends ListenerAdapter {
             e.printStackTrace();
         }
     }
+    public static String superCase(String str){
+        char[] c = str.toLowerCase().toCharArray();
+        c[0]=Character.toUpperCase(c[0]);
+        return String.valueOf(c);
+    }
+    public static MessageEmbed buildEmbed(String title, Color color, String contentTitle, String content){
+        // Create the EmbedBuilder instance
+        EmbedBuilder eb = new EmbedBuilder();
 
+        eb.setColor(color);
+
+
+        eb.addField(contentTitle, content, false);
+        return eb.build();
+    }
+    public static MessageEmbed buildEmbed(String title, Color color, HashMap<String,String> fields){
+        // Create the EmbedBuilder instance
+        EmbedBuilder eb = new EmbedBuilder();
+
+
+        eb.setTitle(title, null);
+
+        eb.setColor(color);
+
+
+        for(String k: fields.keySet()){
+            String value=fields.get(k);
+            eb.addField(k,value,false);
+        }
+        return eb.build();
+    }
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
 
@@ -153,7 +193,10 @@ public class BoneListener extends ListenerAdapter {
             }
             //every 24hrs post message
             while (true) {
-                c.sendMessage(BoneParser.getAllMeals(false,false)).complete();
+                HashMap<String,String> mealsOut = BoneParser.getAllMeals(false,true);
+                c.sendMessageEmbeds(buildEmbed(superCase("Meals for today."),Color.red,mealsOut)).complete();
+
+
                 try {
                     Thread.sleep(oneDay);
                 } catch (InterruptedException e) {

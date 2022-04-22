@@ -7,6 +7,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class BoneParser {
@@ -105,15 +106,7 @@ public class BoneParser {
      * @param intro- Add intro to string or not
      * @return String containing the summary of all meals that day
      */
-    public static String getAllMeals(boolean tomorrow,boolean intro) {
-
-
-        //build out str
-        String out = "";
-        if(intro)
-            out+="__**Hello gamers here are the**__ " + ((tomorrow) ? "__**meals for tomorrow**__" : "__**meals for today**__") + "\n\n";
-        else
-            out+="\n\n";
+    public static HashMap<String,String> getAllMeals(boolean tomorrow, boolean intro) {
 
         //Get day as an DayOfWeek variable
         Date dt = new Date();
@@ -132,48 +125,55 @@ public class BoneParser {
             mealsToPrint = (day==DayOfWeek.SUNDAY)?sun:sat;
 
         }
-
+        HashMap<String,String> mealOutPuts=new HashMap<>();
         //print meals based on decision above
         for (int i = 0; i < mealsToPrint.length; i++) {
             Meal value = mealsToPrint[i];
             List<String> mealList = getMealList(value, tomorrow);
+            String header="";
+            String out="";
 
             //if not dinner just make bold name of meal
             if (value != Meal.DINNER)
-                out += "**" + superCase(value.toString()) + "**\n";
+                header += "**" + superCase(value.toString()) + "**";
 
             //if dinner add floor dinner in bold
             else
-                out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
+                header += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**";
 
             //loop through value fetched from parsed and add them to the string
             for (String s : mealList) {
                 out += " -" + s + "\n";
             }
             out += "\n";
+            mealOutPuts.put(header,out);
         }
-        return out;
+        return mealOutPuts;
     }
 
-    public static String printSingleMeal(Meal meal, boolean tomorrow) {
+    public static ArrayList<String> printSingleMeal(Meal meal, boolean tomorrow) {
 
         //Same thing as all meals, but it filters which to print via the meal variable
-        String out = "";
+        String header = "";
+        String out="";
         for (int i = 0; i < Meal.values().length; i++) {
             Meal value = Meal.values()[i];
             if (meal == value) {
                 List<String> mealList = getMealList(value, tomorrow);
                 if (value != Meal.DINNER)
-                    out += "**" + superCase(value.toString()) + "**\n";
+                    header += "**" + superCase(value.toString()) + "**\n";
                 else
-                    out += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
+                    header += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
                 for (String s : mealList) {
                     out += " -" + s + "\n";
                 }
                 out += "\n";
             }
         }
-        return out;
+        ArrayList<String> values = new ArrayList<>();
+        values.add(header);
+        values.add(out);
+        return values;
     }
 
     //test
