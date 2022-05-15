@@ -5,9 +5,7 @@ import org.joda.time.DateTime;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class BoneParser {
     enum Meal {BREAKFAST, BRUNCH, LUNCH, DINNER, ALL}
@@ -105,15 +103,8 @@ public class BoneParser {
      * @param intro- Add intro to string or not
      * @return String containing the summary of all meals that day
      */
-    public static String getAllMeals(boolean tomorrow,boolean intro) {
 
-
-        //build out str
-        String out = "";
-        /*if(intro)
-            //out+="__**Hello gamers here are the**__ " + ((tomorrow) ? "__**meals for tomorrow**__" : "__**meals for today**__") + "\n\n";
-        else*/
-        out+="\n\n";
+    public static LinkedHashMap<String,String> getAllMeals(boolean tomorrow, boolean intro) {
 
         //Get day as an DayOfWeek variable
         Date dt = new Date();
@@ -132,55 +123,52 @@ public class BoneParser {
             mealsToPrint = (day==DayOfWeek.SUNDAY)?sun:sat;
 
         }
+        LinkedHashMap<String,String> mealOutPuts=new LinkedHashMap<>();
+        for (int i = 0; i < mealsToPrint.length; i++) {
+            Meal value = mealsToPrint[i];
+            List<String> mealList = getMealList(value, tomorrow);
+            String header="";
+            String out="";
 
-        //print meals based on decision above
-        List<Parser> parsers = new ArrayList<>();
-        for (Meal m:mealsToPrint) {
-            parsers.add(new Parser(m,tomorrow));
             //if not dinner just make bold name of meal
+            if (value != Meal.DINNER)
+                header += "**" + superCase(value.toString()) + "**";
 
+            //if dinner add floor dinner in bold
+            else
+                header += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**";
+
+            //loop through value fetched from parsed and add them to the string
+            for (String s : mealList) {
+                out += " -" + s + "\n";
+            }
+            out += "\n";
+            mealOutPuts.put(header,out);
         }
-        for(Parser t:parsers){
-            try {
-                List<String> mealList=t.join();
-                if (t.meal != Meal.DINNER)
-                    out += "**" + superCase(t.meal.toString()) + "**\n";
+        return mealOutPuts;
+    }
 
-                    //if dinner add floor dinner in bold
-                else
-                    out += "**Dinner**\n";
+    public static ArrayList<String> printSingleMeal(Meal meal, boolean tomorrow) {
 
-                //loop through value fetched from parsed and add them to the string
+        //Same thing as all meals, but it filters which to print via the meal variable
+
+        String header = "";
+        String out="";
+        for (int i = 0; i < Meal.values().length; i++) {
+            Meal value = Meal.values()[i];
+            if (meal == value) {
+                List<String> mealList = getMealList(value, tomorrow);
+                header += "**" + superCase(value.toString()) + "**\n";
                 for (String s : mealList) {
                     out += " -" + s + "\n";
                 }
                 out += "\n";
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
-        return out;
-    }
-
-    public static String printSingleMeal(Meal meal, boolean tomorrow) {
-
-        //Same thing as all meals, but it filters which to print via the meal variable
-        String out = "";
-        for (int i = 0; i < Meal.values().length; i++) {
-            Meal value = Meal.values()[i];
-            if (meal == value) {
-                List<String> breakfast = getMealList(value, tomorrow);
-                if (value != Meal.DINNER)
-                    out += "**" + superCase(value.toString()) + "**\n";
-                else
-                    out += "**Dinner**\n";
-                for (String s : breakfast) {
-                    out += " -" + s + "\n";
-                }
-                out += "\n";
-            }
-        }
-        return out;
+        ArrayList<String> values = new ArrayList<>();
+        values.add(header);
+        values.add(out);
+        return values;
     }
 
     //test
