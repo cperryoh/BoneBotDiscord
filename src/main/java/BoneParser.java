@@ -103,6 +103,7 @@ public class BoneParser {
      * @param intro- Add intro to string or not
      * @return String containing the summary of all meals that day
      */
+
     public static LinkedHashMap<String,String> getAllMeals(boolean tomorrow, boolean intro) {
 
         //Get day as an DayOfWeek variable
@@ -123,7 +124,6 @@ public class BoneParser {
 
         }
         LinkedHashMap<String,String> mealOutPuts=new LinkedHashMap<>();
-        //print meals based on decision above
         for (int i = 0; i < mealsToPrint.length; i++) {
             Meal value = mealsToPrint[i];
             List<String> mealList = getMealList(value, tomorrow);
@@ -151,6 +151,7 @@ public class BoneParser {
     public static ArrayList<String> printSingleMeal(Meal meal, boolean tomorrow) {
 
         //Same thing as all meals, but it filters which to print via the meal variable
+
         String header = "";
         String out="";
         for (int i = 0; i < Meal.values().length; i++) {

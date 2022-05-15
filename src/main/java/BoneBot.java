@@ -81,6 +81,10 @@ public class BoneBot {
             //also create a thread for each guild to periodically post meal updates
             for(Guild g:guilds){
                 TextChannel c;
+                if(!hasBotChannel(g,"menu-feed")){
+                    c=g.createTextChannel("menu-feed").complete();
+                }else{
+                    c= g.getTextChannelsByName("menu-feed",false).get(0);
                 if(!hasBotChannel(g,"bone-menu")){
                     c=g.createTextChannel("bone-menu").complete();
                 }else{

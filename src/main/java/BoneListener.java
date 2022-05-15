@@ -31,8 +31,6 @@ public class BoneListener extends ListenerAdapter {
 
 
             switch (event.getName()) {
-
-                //receive steve command
                 case BoneBot.botName: {
                     //reply so message does not error out
                     event.reply("Hold on let me go look").complete();
@@ -77,7 +75,6 @@ public class BoneListener extends ListenerAdapter {
                             } else {
                                 ArrayList<String> mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
                                 event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
-
                             }
                         } else if (dayOfWeek == BoneParser.DayOfWeek.SUNDAY) {
                             if (meal != BoneParser.Meal.BRUNCH && meal != BoneParser.Meal.DINNER) {
@@ -85,7 +82,6 @@ public class BoneListener extends ListenerAdapter {
                             } else {
                                 ArrayList<String> mealsOut = BoneParser.printSingleMeal(meal, tomorrow);
                                 event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
-
                             }
                         }
                         return;
