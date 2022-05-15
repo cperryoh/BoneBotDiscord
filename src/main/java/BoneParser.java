@@ -5,10 +5,7 @@ import org.joda.time.DateTime;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class BoneParser {
     enum Meal {BREAKFAST, BRUNCH, LUNCH, DINNER, ALL}
@@ -106,7 +103,7 @@ public class BoneParser {
      * @param intro- Add intro to string or not
      * @return String containing the summary of all meals that day
      */
-    public static HashMap<String,String> getAllMeals(boolean tomorrow, boolean intro) {
+    public static LinkedHashMap<String,String> getAllMeals(boolean tomorrow, boolean intro) {
 
         //Get day as an DayOfWeek variable
         Date dt = new Date();
@@ -125,7 +122,7 @@ public class BoneParser {
             mealsToPrint = (day==DayOfWeek.SUNDAY)?sun:sat;
 
         }
-        HashMap<String,String> mealOutPuts=new HashMap<>();
+        LinkedHashMap<String,String> mealOutPuts=new LinkedHashMap<>();
         //print meals based on decision above
         for (int i = 0; i < mealsToPrint.length; i++) {
             Meal value = mealsToPrint[i];
@@ -160,10 +157,7 @@ public class BoneParser {
             Meal value = Meal.values()[i];
             if (meal == value) {
                 List<String> mealList = getMealList(value, tomorrow);
-                if (value != Meal.DINNER)
-                    header += "**" + superCase(value.toString()) + "**\n";
-                else
-                    header += "**FLOOOOOOOOOOOORRRRRRRRRR DINNNNNNNNEERRRRRR**\n";
+                header += "**" + superCase(value.toString()) + "**\n";
                 for (String s : mealList) {
                     out += " -" + s + "\n";
                 }

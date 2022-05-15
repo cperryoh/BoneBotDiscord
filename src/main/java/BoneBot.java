@@ -26,6 +26,7 @@ public class BoneBot {
         }
         return false;
     }
+    static final String botName = "howard";
     public static void main(String[] args) {
         try {
 
@@ -38,19 +39,19 @@ public class BoneBot {
             //build and connect bot
             JDA builder = null;
             String authKey;
-            boolean exists = Files.exists(Path.of(System.getProperty("user.dir")+File.separator+"key.txt"));
+            boolean exists = Files.exists(Path.of(System.getProperty("user.dir")+File.separator+botName+"CafeBot.txt"));
 
             //if auth key is not found in files ask for one
             if(!exists){
                 Scanner scn = new Scanner(System.in);
                 System.out.print("Enter bot auth key: ");
                 authKey = scn.nextLine();
-                PrintWriter printer=  new PrintWriter("key.txt");
+                PrintWriter printer=  new PrintWriter(botName+"CafeBot.txt");
                 printer.print(authKey);
                 printer.close();
             }else{
                 //if found, read it
-                Scanner scn =new Scanner(new File("key.txt"));
+                Scanner scn =new Scanner(new File(botName+"CafeBot.txt"));
                 authKey=scn.next();
             }
 
@@ -64,7 +65,7 @@ public class BoneBot {
             //add commands to bot
             CommandListUpdateAction commands = builder.updateCommands();
             commands.addCommands(
-                    Commands.slash("steve", "Ask steve to fetch the bone meals for today")
+                    Commands.slash(botName, "Ask "+botName+" to fetch the bone meals for today")
                             .addOptions(new OptionData(INTEGER, "day", "the day to get the meals for") // USER type allows to include members of the server or other users by id
                                     .setRequired(true).addChoice("today",0).addChoice("tomorrow",1)) // This command requires a parameter
                             .addOptions(new OptionData(INTEGER, "meal", "the meal(s) to fetch").addChoice("breakfast",0).addChoice("brunch",1).addChoice("lunch",2).addChoice("dinner",3).addChoice("all",4)) // optional reason
@@ -111,7 +112,7 @@ public class BoneBot {
                     //when it comes, print meal message to steve channel and wait 24hrs to print agian
                     while (true){
                         System.out.println("Sending out daily update to guild: "+g.getName());
-                        HashMap<String,String> allMeals = BoneParser.getAllMeals(false,true);
+                        LinkedHashMap<String,String> allMeals = BoneParser.getAllMeals(false,true);
                         channel.sendMessageEmbeds(BoneListener.buildEmbed("Bone menu for today", Color.red,allMeals)).complete();
                         try {
                             Thread.sleep(oneDay);

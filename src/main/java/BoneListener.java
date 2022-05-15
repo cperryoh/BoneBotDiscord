@@ -8,9 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class BoneListener extends ListenerAdapter {
@@ -23,7 +21,7 @@ public class BoneListener extends ListenerAdapter {
     }
 
     public void printCommands(SlashCommandInteractionEvent c) {
-        String out = "Hello, I am steve.\n/howard [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
+        String out = "Hello, I am "+BoneBot.botName+".\n/howard [day] [meal]\nday - today, tomorrow or tm\nmeal - breakfast, lunch, dinner or all\n";
         c.getChannel().sendMessage(out).complete();
     }
 
@@ -35,13 +33,13 @@ public class BoneListener extends ListenerAdapter {
             switch (event.getName()) {
 
                 //receive steve command
-                case "steve": {
+                case BoneBot.botName: {
                     //reply so message does not error out
                     event.reply("Hold on let me go look").complete();
 
                     //check that the user gave options for both meals
                     if (!(event.getOption("day") != null && event.getOption("meal") != null)) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /howard command");
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /"+BoneBot.botName+" command");
                         printCommands(event);
                         System.out.println("Not valid command, printing intro");
                         return;
@@ -60,7 +58,7 @@ public class BoneListener extends ListenerAdapter {
                     //if user asks for all meals, send them and return
                     if (meal.toString().equals("ALL")) {
                         System.out.println("Printing all");
-                        HashMap<String,String> mealsOut = BoneParser.getAllMeals(tomorrow,true);
+                        LinkedHashMap<String,String> mealsOut = BoneParser.getAllMeals(tomorrow,true);
                         event.getChannel().sendMessageEmbeds(buildEmbed("Meals for "+((tomorrow)?"tomorrow":"today")+".",Color.red,mealsOut)).complete();
 
                         return;
@@ -113,7 +111,7 @@ public class BoneListener extends ListenerAdapter {
                         event.getChannel().sendMessageEmbeds(buildEmbed(superCase(meal.toString())+" for "+((tomorrow)?"tomorrow":"today")+".",Color.blue, mealsOut.get(0), mealsOut.get(1))).complete();
 
                     } catch (Exception e) {
-                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /steve command").complete();
+                        event.getChannel().sendMessage("That is not a valid command, here is the format of a /"+BoneBot.botName+" command").complete();
                         System.out.println("Not valid command, printing intro");
                         printCommands(event);
                     }
@@ -145,7 +143,7 @@ public class BoneListener extends ListenerAdapter {
         eb.addField(contentTitle, content, false);
         return eb.build();
     }
-    public static MessageEmbed buildEmbed(String title, Color color, HashMap<String,String> fields){
+    public static MessageEmbed buildEmbed(String title, Color color, LinkedHashMap<String,String> fields){
         // Create the EmbedBuilder instance
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -193,7 +191,7 @@ public class BoneListener extends ListenerAdapter {
             }
             //every 24hrs post message
             while (true) {
-                HashMap<String,String> mealsOut = BoneParser.getAllMeals(false,true);
+                LinkedHashMap<String,String> mealsOut = BoneParser.getAllMeals(false,true);
                 c.sendMessageEmbeds(buildEmbed(superCase("Meals for today."),Color.red,mealsOut)).complete();
 
 
