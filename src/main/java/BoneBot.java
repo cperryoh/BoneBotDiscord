@@ -26,7 +26,7 @@ public class BoneBot {
         }
         return false;
     }
-    static final String botName = "howard";
+    static final String botName = "steve";
     public static void main(String[] args) {
         try {
 
